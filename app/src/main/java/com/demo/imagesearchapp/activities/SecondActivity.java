@@ -79,7 +79,6 @@ public class SecondActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
-                Toast.makeText(this, "Home Clicked", Toast.LENGTH_LONG).show();
                 onBackPressed();
         }
         return (super.onOptionsItemSelected(menuItem));
