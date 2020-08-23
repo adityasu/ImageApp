@@ -1,7 +1,9 @@
 package com.demo.imagesearchapp.activities
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -28,10 +30,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var spinner: ProgressBar
     lateinit var noResultsTextView: TextView
     var  responseData: List<Data>? = null
+    lateinit var rvData : RecyclerView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var rvData = findViewById<View>(R.id.rvData) as RecyclerView
+        rvData = findViewById<View>(R.id.rvData) as RecyclerView
         rvData.layoutManager = GridLayoutManager(this, 2)
         spinner= findViewById<ProgressBar>(R.id.progressBar)
         noResultsTextView = findViewById<TextView>(R.id.no_results_textview)
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         search_bar.setOnQueryTextListener(object :
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
+                search_bar.clearFocus()
                 spinner.visibility = View.VISIBLE
                 callApi(query, jsonPlaceHolderApi, this@MainActivity)
                 return false
@@ -100,5 +104,14 @@ class MainActivity : AppCompatActivity() {
                 noResultsTextView.visibility = View.GONE
             }
         })
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            rvData.layoutManager = GridLayoutManager(this, 2)
+        } else {
+            rvData.layoutManager = GridLayoutManager(this, 3)
+        }
     }
 }

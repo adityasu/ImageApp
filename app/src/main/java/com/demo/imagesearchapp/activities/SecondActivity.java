@@ -54,6 +54,7 @@ public class SecondActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 dbHelper.updateComment(comment_edittext.getText().toString(), image_id);
+                comment_edittext.getText().clear();
                 showComment(image_id);
             }
         });
