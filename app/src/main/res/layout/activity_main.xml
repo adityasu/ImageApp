@@ -22,4 +22,24 @@
         android:layout_below="@+id/search_bar"
         >
     </androidx.recyclerview.widget.RecyclerView>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:elevation="20dp"
+        android:id="@+id/progressBar"
+        android:progressDrawable="@drawable/circular_progress_bar"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/no_results_textview"
+        android:visibility="gone"
+        android:text="@string/no_results_string"
+        android:textSize="20sp"
+        />
   </RelativeLayout>

@@ -11,6 +11,8 @@
     <string name="comment_string">Comment : </string>
     <string name="title_string">Title : </string>
     <string name="id_string">ID : </string>
+    <string name="no_results_string">No Results Found</string>
+
 
     Submit Comment
 

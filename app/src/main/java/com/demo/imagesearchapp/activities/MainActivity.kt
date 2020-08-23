@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,13 +24,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity() {
-    var data: List<Data>? = null
     var TAG : String = javaClass.name
+    lateinit var spinner: ProgressBar
+    lateinit var noResultsTextView: TextView
+    var  responseData: List<Data>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var rvData = findViewById<View>(R.id.rvData) as RecyclerView
-        rvData.layoutManager = GridLayoutManager(this,2)
+        rvData.layoutManager = GridLayoutManager(this, 2)
+        spinner= findViewById<ProgressBar>(R.id.progressBar)
+        noResultsTextView = findViewById<TextView>(R.id.no_results_textview)
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.imgur.com/")
@@ -37,8 +43,10 @@ class MainActivity : AppCompatActivity() {
         val jsonPlaceHolderApi: JsonPlaceholderApi = retrofit.create<JsonPlaceholderApi>(
             JsonPlaceholderApi::class.java
         )
-        search_bar.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+        search_bar.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
+                spinner.visibility = View.VISIBLE
                 callApi(query, jsonPlaceHolderApi, this@MainActivity)
                 return false
             }
@@ -49,24 +57,47 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun callApi (query : String, jsonPlaceholderApi: JsonPlaceholderApi, context: Context) {
-        val call: Call<Json4Kotlin_Base> = jsonPlaceholderApi.getData(query,"Client-ID 137cda6b5008a7c")
-        Log.d(TAG, "onResponse: ConfigurationListener::"+call.request().header("Authorization"));
+    fun callApi(query: String, jsonPlaceholderApi: JsonPlaceholderApi, context: Context) {
+        val call: Call<Json4Kotlin_Base> = jsonPlaceholderApi.getData(
+            query,
+            "Client-ID 137cda6b5008a7c"
+        )
+        Log.d(TAG, "onResponse: ConfigurationListener::" + call.request().header("Authorization"));
         call.enqueue(object : Callback<Json4Kotlin_Base> {
-            override fun onResponse(call: Call<Json4Kotlin_Base>, response: Response<Json4Kotlin_Base>) {
+            override fun onResponse(
+                call: Call<Json4Kotlin_Base>,
+                response: Response<Json4Kotlin_Base>
+            ) {
                 if (response.isSuccessful) {
-                    val demo : List<Data>? = response.body()?.data
-                    data = demo
-                    var adapter = ImagesAdapter(data, context)
+                    responseData = response.body()?.data
+                    val adapter = ImagesAdapter(responseData, context)
                     rvData.adapter = adapter
-                    Toast.makeText(this@MainActivity, "Success",Toast.LENGTH_LONG).show()
+                    if(responseData?.size == 0) {
+                        Toast.makeText(this@MainActivity, "No Results Found", Toast.LENGTH_LONG).show()
+                        spinner.visibility = View.GONE
+                        noResultsTextView.visibility = View.VISIBLE
+                        adapter.notifyDataSetChanged()
+                        return
+                    }
+                    Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_LONG).show()
+                    spinner.visibility = View.GONE
+                    noResultsTextView.visibility = View.GONE
                     return
                 } else {
-                    Toast.makeText(this@MainActivity, "No Match found",Toast.LENGTH_LONG).show()
+                    spinner.visibility = View.GONE
+                    noResultsTextView.visibility = View.GONE
+                    Toast.makeText(this@MainActivity, "Response failed" + response.message(), Toast.LENGTH_LONG).show()
                 }
             }
+
             override fun onFailure(call: Call<Json4Kotlin_Base>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Api Failed because : " + t.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    "Api Failed because : " + t.message,
+                    Toast.LENGTH_LONG
+                ).show()
+                spinner.visibility = View.GONE
+                noResultsTextView.visibility = View.GONE
             }
         })
     }
