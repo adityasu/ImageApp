@@ -35,7 +35,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         rvData = findViewById<View>(R.id.rvData) as RecyclerView
-        rvData.layoutManager = GridLayoutManager(this, 2)
+
+        if (this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            rvData.layoutManager = GridLayoutManager(this, 2)
+        } else {
+            rvData.layoutManager = GridLayoutManager(this, 3)
+        }
+
         spinner= findViewById<ProgressBar>(R.id.progressBar)
         noResultsTextView = findViewById<TextView>(R.id.no_results_textview)
 
@@ -46,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         val jsonPlaceHolderApi: JsonPlaceholderApi = retrofit.create<JsonPlaceholderApi>(
             JsonPlaceholderApi::class.java
         )
+
         search_bar.setOnQueryTextListener(object :
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
